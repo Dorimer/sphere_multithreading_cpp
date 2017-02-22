@@ -129,12 +129,23 @@ void Allocator::realloc(Pointer& ptr, size_t N) {
         inner->size = N;
     } else {
         //иначе освободим текущую область и выделим другую
-        void* prev_data = inner->pointer;
-        size_t prev_size = inner->size;
+        void* data = inner->pointer;
+        size_t size = inner->size;
+        InnerPointer *next_inner = inner->next, *prev_inner;
         free(ptr);
-        ptr = alloc(N);
-        std::memmove(ptr.inner->pointer, prev_data, prev_size);
-        available_size += N - prev_size;
+        try {
+            ptr = alloc(N);
+            std::memmove(ptr.inner->pointer, data, size);
+            available_size += N - size;
+        }
+        catch (AllocError &) {
+            //в случае ошибки выделения, находим место в списке и возвращаем на место старую структуру
+            for (prev_inner = innerspace_ptr; prev_inner->next != next_inner; prev_inner++)
+                ;
+            inner = inner_alloc(data,size,prev_inner,next_inner);
+            ptr = Pointer(inner);
+            throw;
+        }
     }
 }
 
