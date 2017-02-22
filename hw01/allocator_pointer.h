@@ -8,9 +8,9 @@
 class Allocator;
 
 class Pointer {
+public:
     InnerPointer* inner;
 
-public:
     Pointer()
         : inner(nullptr) {}
 
@@ -18,8 +18,6 @@ public:
         : inner(_inner) {}
 
     void* get() const;
-
-    friend class Allocator;
 };
 
 #endif //ALLOCATOR_POINTER
