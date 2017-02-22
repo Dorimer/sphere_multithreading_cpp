@@ -17,49 +17,29 @@ class Pointer;
  */
 class Allocator {
 private:
-    void* base_ptr;
-    int pointers_all;
-    int pointers_empty;
-    size_t base_size;
-    size_t available_size;
-    InnerPointer* innerspace_ptr;
-    InnerPointer* inner_root_ptr;
-    InnerPointer* inner_last_ptr;
+    void* base_ptr; //ссылка на начало бока памяти
+    int pointers_all; //количество выделенных ячеек служебной памяти
+    int pointers_empty; //количество пустых ячеек среди выделенных
+    size_t available_size; //количество байт, доступных для записи
+    InnerPointer* innerspace_ptr; //начало служебной области
+    InnerPointer* inner_root_ptr; //указатель на голову списка указателей
+    InnerPointer* inner_last_ptr; //указатель на хвост списка указателей
 
 public:
     Allocator(void* base, size_t size);
 
-    /**
-     * @param N size_t
-     */
+    //выделение памяти
     Pointer alloc(size_t N);
-
-    /**
-     * TODO: semantics
-     * @param p Pointer
-     * @param N size_t
-     */
+    //изменение размера выделенной области
     void realloc(Pointer& ptr, size_t N);
-
-    /**
-     * TODO: semantics
-     * @param p Pointer
-     */
+    //освобождение выделенной памяти
     void free(Pointer& ptr);
-
-    /**
-     * TODO: semantics
-     */
+    //дефрагментация памяти
     void defrag();
-
+    //выделение служебной памяти и создание указателя внутри неё
     InnerPointer* inner_alloc(void* address, size_t size, InnerPointer* prev_inner, InnerPointer* next_inner);
-
+    //удаление указателя и освобождение участка служебной памяти
     void inner_free(InnerPointer* ptr);
-
-    /**
-     * TODO: semantics
-     */
-    std::string dump() const { return ""; }
 };
 
 #endif // ALLOCATOR
